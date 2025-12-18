@@ -6,7 +6,6 @@
         "DirtPathBlockMixin",
         "ShovelItemMixin",
         "BlockStateShapeMixin"
-        
 	],
 	"injectors": {
 		"defaultRequire": 1
