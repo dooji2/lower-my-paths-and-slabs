@@ -1,7 +1,6 @@
 package com.dooji.lmps.mixin.client.sodium;
 
 import com.dooji.lmps.path.PathSupport;
-import com.dooji.lmps.registry.PathRules;
 import net.caffeinemc.mods.sodium.client.render.chunk.compile.pipeline.BlockOcclusionCache;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
