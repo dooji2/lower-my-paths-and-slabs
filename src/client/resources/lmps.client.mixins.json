@@ -5,7 +5,7 @@
     "client": [
         "BlockStateOffsetMixin",
         "BlockShouldRenderFaceMixin",
-        "BedRendererMixin"
+        "BlockEntityRenderDispatcherMixin"
     ],
 	"injectors": {
 		"defaultRequire": 1
