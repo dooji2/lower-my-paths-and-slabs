@@ -8,7 +8,6 @@ A **_cursed_** Minecraft mod that lets you place blocks on top of dirt paths wit
 **Known Issues (to be fixed):**
 - Raycast is off
 - Blocks above a block lowered onto a slab should not also be lowered (not really a bug, but it really depends on those who use this mod, let me know)
-- Doesn't work with chests (the model itself isn't lowered); enchantment table book is not lowered
 
 ## To make other blocks be lowered:
 - Read this to know how datapacks work first: https://minecraft.wiki/w/Tutorial:Creating_a_data_pack
