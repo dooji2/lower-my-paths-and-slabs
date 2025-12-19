@@ -5,7 +5,8 @@
 	"mixins": [
         "DirtPathBlockMixin",
         "ShovelItemMixin",
-        "BlockStateShapeMixin"
+        "BlockStateShapeMixin",
+        "BlockGetterClipMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
