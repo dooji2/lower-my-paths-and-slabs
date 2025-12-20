@@ -30,24 +30,10 @@ public abstract class BlockRendererMixin {
     @Inject(method = "renderModel", at = @At(value = "INVOKE", target = "Lorg/joml/Vector3f;set(FFF)Lorg/joml/Vector3f;", shift = At.Shift.AFTER))
     private void lowerFriendlyModels(BakedModel bakedModel, BlockState blockState, BlockPos blockPosition, BlockPos modelOffset, CallbackInfo callbackInfo) {
         if (levelForOffsets != null) {
-            PathSupport.LoweringOffsets offsets = PathSupport.loweringOffsets(levelForOffsets, blockPosition, 8);
+            PathSupport.LoweringOffsets offsets = PathSupport.loweringOffsets(levelForOffsets, blockPosition);
             if (offsets != null && offsets.renderOffset() > 0.0) {
                 posOffset.set(posOffset.x(), (float) (posOffset.y() - offsets.renderOffset()), posOffset.z());
             }
         }
-    }
-
-    @Unique
-    private boolean shouldLower(BlockAndTintGetter level, BlockPos position, int remainingChecks) {
-        if (remainingChecks <= 0) {
-            return false;
-        }
-
-        PathSupport.LoweringOffsets offsets = PathSupport.loweringOffsets(level, position, 1);
-        if (offsets != null && offsets.renderOffset() > 0.0) {
-            return true;
-        }
-
-        return shouldLower(level, position.below(), remainingChecks - 1);
     }
 }

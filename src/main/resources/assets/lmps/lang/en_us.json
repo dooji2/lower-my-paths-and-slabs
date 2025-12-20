@@ -1,0 +1,6 @@
+{
+  "item.lmps.offset_tool": "Offset Tool",
+  "text.lmps.offset_tool.enabled": "Enabled Offset",
+  "text.lmps.offset_tool.disabled": "Disabled Offset",
+  "text.lmps.offset_tool.no_permission": "You do not have permission to toggle offsets"
+}

@@ -22,7 +22,7 @@ public interface BlockGetterClipMixin {
         BlockGetter level = (BlockGetter) (Object) this;
         BlockHitResult fallback = BlockGetter.traverseBlocks(clipContext.getFrom(), clipContext.getTo(), clipContext, (context, position) -> {
             BlockPos abovePos = position.above();
-            PathSupport.LoweringOffsets offsets = PathSupport.loweringOffsets(level, abovePos, 8);
+            PathSupport.LoweringOffsets offsets = PathSupport.loweringOffsets(level, abovePos);
             if (offsets == null || offsets.renderOffset() <= 0.0) {
                 return null;
             }
@@ -56,7 +56,7 @@ public interface BlockGetterClipMixin {
             return;
         }
 
-        PathSupport.LoweringOffsets offsets = PathSupport.loweringOffsets(level, chosen.getBlockPos(), 8);
+        PathSupport.LoweringOffsets offsets = PathSupport.loweringOffsets(level, chosen.getBlockPos());
         if (offsets != null && offsets.renderOffset() > 0.0) {
             Vec3 adjustedLocation = chosen.getLocation().add(0.0, offsets.renderOffset(), 0.0);
             chosen = new BlockHitResult(adjustedLocation, chosen.getDirection(), chosen.getBlockPos(), chosen.isInside());

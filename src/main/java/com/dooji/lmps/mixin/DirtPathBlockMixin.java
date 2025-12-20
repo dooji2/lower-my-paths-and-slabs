@@ -1,6 +1,6 @@
 package com.dooji.lmps.mixin;
 
-import com.dooji.lmps.registry.LmpsBlockTags;
+import com.dooji.lmps.path.OffsetState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.DirtPathBlock;
@@ -14,9 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class DirtPathBlockMixin {
     @Inject(method = "canSurvive", at = @At("HEAD"), cancellable = true)
     private void allowFriendlySupports(BlockState blockState, LevelReader levelReader, BlockPos position, CallbackInfoReturnable<Boolean> callbackInfoReturnable) {
-        if (levelReader.getBlockState(position.above()).is(LmpsBlockTags.PATH_FRIENDLY_SUPPORTS)) {
+        if (OffsetState.isEnabled(levelReader, position.above())) {
             callbackInfoReturnable.setReturnValue(true);
-            return;
         }
     }
 }

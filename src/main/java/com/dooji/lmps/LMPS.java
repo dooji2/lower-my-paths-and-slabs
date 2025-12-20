@@ -1,20 +1,14 @@
 package com.dooji.lmps;
 
-import com.dooji.lmps.networking.payloads.PathRulesPayload;
-import com.dooji.lmps.registry.LmpsBlockTags;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import com.dooji.lmps.networking.LmpsNetworking;
+import com.dooji.lmps.permission.LmpsPermissions;
+import com.dooji.lmps.registry.LmpsItems;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.context.UseOnContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,28 +18,25 @@ public class LMPS implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        PayloadTypeRegistry.playS2C().register(PathRulesPayload.TYPE, PathRulesPayload.STREAM_CODEC);
+        LmpsPermissions.load();
+        LmpsNetworking.register();
 
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-            Registry<Block> blockRegistry = server.registryAccess().registryOrThrow(Registries.BLOCK);
-            int pathFriendlySupportCount = blockRegistry
-                .getTag(LmpsBlockTags.PATH_FRIENDLY_SUPPORTS)
-                .map(holderSet -> (int) holderSet.stream().count())
-                .orElse(0);
-            LOGGER.info("Loaded {} path friendly supports", pathFriendlySupportCount);
-        });
+        LmpsItems.register();
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            Registry<Block> blockRegistry = server.registryAccess().registryOrThrow(Registries.BLOCK);
-            List<ResourceLocation> pathFriendlySupportIds = blockRegistry
-                .getTag(LmpsBlockTags.PATH_FRIENDLY_SUPPORTS)
-                .map(holderSet -> holderSet.stream()
-                    .map(Holder::value)
-                    .map(blockRegistry::getKey)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList()))
-                .orElse(List.of());
-            ServerPlayNetworking.send(handler.player, new PathRulesPayload(pathFriendlySupportIds));
+            LmpsNetworking.sendSnapshot(handler.player);
+        });
+
+        ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((serverPlayer, serverLevel, serverLevel1) -> {
+            LmpsNetworking.sendSnapshot(serverPlayer);
+        });
+
+        UseBlockCallback.EVENT.register((player, level, hand, blockHitResult) -> {
+            if (!player.getItemInHand(hand).is(LmpsItems.OFFSET_TOOL)) {
+                return InteractionResult.PASS;
+            }
+
+            return LmpsItems.OFFSET_TOOL.useOn(new UseOnContext(player, hand, blockHitResult));
         });
     }
 }

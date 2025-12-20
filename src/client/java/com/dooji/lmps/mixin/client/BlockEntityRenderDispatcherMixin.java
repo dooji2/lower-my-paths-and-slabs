@@ -18,7 +18,7 @@ public abstract class BlockEntityRenderDispatcherMixin {
             return;
         }
 
-        PathSupport.LoweringOffsets offsets = PathSupport.loweringOffsets(blockEntity.getLevel(), blockEntity.getBlockPos(), 8);
+        PathSupport.LoweringOffsets offsets = PathSupport.loweringOffsets(blockEntity.getLevel(), blockEntity.getBlockPos());
         if (offsets != null && offsets.renderOffset() > 0.0) {
             poseStack.translate(0.0, -offsets.renderOffset(), 0.0);
         }
