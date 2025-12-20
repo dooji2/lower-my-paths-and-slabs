@@ -45,9 +45,13 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modCompileOnly "maven.modrinth:AANobbMI:${project.sodium_version}"
-	modLocalRuntime "maven.modrinth:AANobbMI:${project.sodium_version}"
+	if (!project.hasProperty("noSodiumRuntime")) {
+		modLocalRuntime "maven.modrinth:AANobbMI:${project.sodium_version}"
+	}
 	modCompileOnly "maven.modrinth:YL57xq9U:${project.iris_version}"
-	modLocalRuntime "maven.modrinth:YL57xq9U:${project.iris_version}"
+	if (!project.hasProperty("noIrisRuntime")) {
+		modLocalRuntime "maven.modrinth:YL57xq9U:${project.iris_version}"
+	}
 	
 }
 

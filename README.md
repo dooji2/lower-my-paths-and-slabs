@@ -1,26 +1,10 @@
 # Lower My Paths and Slabs!
-A **_cursed_** Minecraft mod that lets you place blocks on top of dirt paths without turning them back to dirt, and lowers the block model & collision! It also works with slabs (so you can have a bed on a bottom half slab...).
+A Minecraft mod that lets you place blocks on top of dirt paths and slabs, by lowering the model and collision of the block.
 
 **This mod doesn't modify anything permanently, therefore you can remove it or add it back at anytime!**
 
 <img width="1920" height="1009" alt="2025-12-18_17 09 19" src="https://github.com/user-attachments/assets/6b81f495-112c-4c0e-97a7-2f46cbf7f9b5" />
 
-It currently also offsets the 8 blocks above it, in the near future the offset will be off by default and will be toggleable with an item, per-block.
+There is an Offset Tool (found in the Tools & Utilities tab) which toggles lowering per-block. Offsets are off by default except for blocks sitting directly on a dirt path or bottom slab, and you can turn them on or off by right-clicking with the Offset Tool.
 
-## To make other blocks be lowered:
-- Read this to know how datapacks work first: https://minecraft.wiki/w/Tutorial:Creating_a_data_pack
-- Create `data/lmps/tags/block/path_friendly_supports.json` in your datapack, then list the blocks you want, such as:
-```
-{
-  "replace": false,
-  "values": [
-    "#minecraft:fences",
-    "#minecraft:fence_gates",
-    "#minecraft:walls",
-    "#minecraft:wool_carpets",
-    "minecraft:anvil",
-    "minecraft:chipped_anvil",
-    "minecraft:damaged_anvil"
-  ]
-}
-```
+Multipart blocks only offset when every part sits above a path block or bottom slab.

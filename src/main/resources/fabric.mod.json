@@ -3,7 +3,7 @@
 	"id": "lmps",
 	"version": "${version}",
 	"name": "Lower My Paths & Slabs!",
-	"description": "Lowers block models on top of dirt paths/slabs and keeps paths from turning back into dirt for a configurable list of supported blocks.",
+	"description": "Lowers block models on top of dirt paths/slabs (toggleable)!",
 	"authors": [
 		"dooji"
 	],
