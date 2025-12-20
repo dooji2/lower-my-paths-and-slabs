@@ -1,9 +1,7 @@
 package com.dooji.lmps.path;
 
-import com.dooji.lmps.registry.LmpsBlockTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.SlabBlock;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,24 +20,17 @@ public final class PathSupport {
         return blockState.is(Blocks.DIRT_PATH);
     }
 
-    public static boolean canRestAbovePath(BlockState blockState) {
-        return blockState.is(LmpsBlockTags.PATH_FRIENDLY_SUPPORTS);
+    public static boolean hasDirectLoweringSupport(BlockGetter level, BlockPos position) {
+        return hasLoweringSupport(level.getBlockState(position.below()));
     }
 
-    public static boolean isCarpet(BlockState blockState) {
-        return blockState.is(BlockTags.WOOL_CARPETS);
-    }
+    public static LoweringOffsets loweringOffsets(BlockGetter level, BlockPos position) {
+        int remainingChecks = position.getY() - level.getMinBuildHeight() + 1;
+        if (remainingChecks < 1) {
+            remainingChecks = 1;
+        }
 
-    public static boolean allowFlatteningOver(BlockState blockState) {
-        return blockState.isAir() || canRestAbovePath(blockState);
-    }
-
-    public static boolean isPathBelow(BlockGetter level, BlockPos position) {
-        return isPathBlock(level.getBlockState(position.below()));
-    }
-
-    public static boolean isLoweringSupportBelow(BlockGetter level, BlockPos position) {
-        return loweringOffsets(level, position, 1) != null;
+        return loweringOffsets(level, position, remainingChecks);
     }
 
     public static LoweringOffsets loweringOffsets(BlockGetter level, BlockPos position, int remainingChecks) {
@@ -47,19 +38,36 @@ public final class PathSupport {
             return null;
         }
 
+        if (!OffsetState.isEnabled(level, position)) {
+            return null;
+        }
+
         BlockState belowState = level.getBlockState(position.below());
-        if (isPathBlock(belowState)) {
+        LoweringOffsets offsets = loweringOffsets(belowState);
+        if (offsets != null) {
+            return offsets;
+        }
+
+        return loweringOffsets(level, position.below(), remainingChecks - 1);
+    }
+
+    public static LoweringOffsets loweringOffsets(BlockState blockState) {
+        if (isPathBlock(blockState)) {
             return new LoweringOffsets(PATH_STEP, PATH_COLLISION_STEP);
         }
 
-        if (belowState.getBlock() instanceof SlabBlock) {
-            SlabType type = belowState.getValue(SlabBlock.TYPE);
+        if (blockState.getBlock() instanceof SlabBlock) {
+            SlabType type = blockState.getValue(SlabBlock.TYPE);
             if (type == SlabType.BOTTOM && type != SlabType.DOUBLE) {
                 return new LoweringOffsets(SLAB_STEP, SLAB_COLLISION_STEP);
             }
         }
 
-        return loweringOffsets(level, position.below(), remainingChecks - 1);
+        return null;
+    }
+
+    public static boolean hasLoweringSupport(BlockState blockState) {
+        return loweringOffsets(blockState) != null;
     }
 
     public record LoweringOffsets(double renderOffset, double collisionOffset) {
