@@ -4,12 +4,12 @@ import com.dooji.lmps.LMPS;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.dooji.lmps.platform.LmpsPlatform;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.level.ServerPlayer;
 
 public final class LmpsPermissions {
@@ -21,7 +21,7 @@ public final class LmpsPermissions {
     }
 
     public static void load() {
-        Path configPath = FabricLoader.getInstance().getConfigDir().resolve("lmps_permissions.json");
+        Path configPath = LmpsPlatform.configPath("lmps_permissions.json");
         if (Files.exists(configPath)) {
             try (Reader reader = Files.newBufferedReader(configPath)) {
                 JsonObject jsonObject = GSON.fromJson(reader, JsonObject.class);
