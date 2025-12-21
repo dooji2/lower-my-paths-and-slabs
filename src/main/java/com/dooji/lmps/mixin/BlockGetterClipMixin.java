@@ -3,6 +3,7 @@ package com.dooji.lmps.mixin;
 import com.dooji.lmps.path.PathSupport;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.state.BlockState;
@@ -32,7 +33,8 @@ public interface BlockGetterClipMixin {
             return loweredShape.clip(context.getFrom(), context.getTo(), abovePos);
         }, context -> {
             Vec3 delta = context.getFrom().subtract(context.getTo());
-            return BlockHitResult.miss(context.getTo(), Direction.getNearest(delta.x, delta.y, delta.z), BlockPos.containing(context.getTo()));
+            Vec3i directionVector = new Vec3i((int) Math.round(delta.x), (int) Math.round(delta.y), (int) Math.round(delta.z));
+            return BlockHitResult.miss(context.getTo(), Direction.getNearest(directionVector, null), BlockPos.containing(context.getTo()));
         });
 
         BlockHitResult original = cir.getReturnValue();

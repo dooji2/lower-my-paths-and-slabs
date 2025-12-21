@@ -11,6 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
 
 public final class LmpsPermissions {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -45,6 +47,7 @@ public final class LmpsPermissions {
     }
 
     public static boolean canToggle(ServerPlayer serverPlayer) {
-        return serverPlayer.hasPermissions(requiredPermissionLevel);
+        PermissionLevel level = PermissionLevel.byId(requiredPermissionLevel);
+        return serverPlayer.permissions().hasPermission(new Permission.HasCommandLevel(level));
     }
 }

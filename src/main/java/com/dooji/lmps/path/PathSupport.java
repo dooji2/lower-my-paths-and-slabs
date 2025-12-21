@@ -25,7 +25,7 @@ public final class PathSupport {
     }
 
     public static LoweringOffsets loweringOffsets(BlockGetter level, BlockPos position) {
-        int remainingChecks = position.getY() - level.getMinBuildHeight() + 1;
+        int remainingChecks = position.getY() - level.getMinY() + 1;
         if (remainingChecks < 1) {
             remainingChecks = 1;
         }

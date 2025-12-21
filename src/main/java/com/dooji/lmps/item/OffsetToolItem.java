@@ -6,6 +6,7 @@ import com.dooji.lmps.path.OffsetState;
 import com.dooji.lmps.path.MultipartHelper;
 import com.dooji.lmps.permission.LmpsPermissions;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -18,13 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OffsetToolItem extends Item {
-    public OffsetToolItem(Properties properties) {
-        super(properties);
+    public OffsetToolItem(ResourceKey<Item> key, Properties properties) {
+        super(properties.setId(key));
     }
 
     @Override
     public InteractionResult useOn(UseOnContext useOnContext) {
-        if (useOnContext.getLevel().isClientSide) {
+        if (useOnContext.getLevel().isClientSide()) {
             return InteractionResult.SUCCESS;
         }
 

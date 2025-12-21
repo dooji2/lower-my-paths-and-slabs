@@ -20,7 +20,7 @@ public final class LmpsNetworking {
     }
 
     public static void sendSnapshot(ServerPlayer player) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level().getLevel();
         Long2BooleanMap overrides = OffsetSavedData.get(level).snapshot();
         ServerPlayNetworking.send(player, new OffsetOverridesPayload(overrides));
     }

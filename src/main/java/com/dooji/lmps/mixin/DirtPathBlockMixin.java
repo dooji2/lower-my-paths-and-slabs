@@ -13,9 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(DirtPathBlock.class)
 public abstract class DirtPathBlockMixin {
     @Inject(method = "canSurvive", at = @At("HEAD"), cancellable = true)
-    private void allowFriendlySupports(BlockState blockState, LevelReader levelReader, BlockPos position, CallbackInfoReturnable<Boolean> callbackInfoReturnable) {
+    private void allowFriendlySupports(BlockState blockState, LevelReader levelReader, BlockPos position, CallbackInfoReturnable<Boolean> cir) {
         if (OffsetState.isEnabled(levelReader, position.above())) {
-            callbackInfoReturnable.setReturnValue(true);
+            cir.setReturnValue(true);
         }
     }
 }

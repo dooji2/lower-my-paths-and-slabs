@@ -3,8 +3,9 @@
 	"package": "com.dooji.lmps.mixin.client",
 	"compatibilityLevel": "JAVA_21",
     "client": [
+        "BlockEntityRenderStateMixin",
         "BlockStateOffsetMixin",
-        "BlockShouldRenderFaceMixin",
+        "indigo.BlockRenderInfoMixin",
         "BlockEntityRenderDispatcherMixin"
     ],
 	"injectors": {

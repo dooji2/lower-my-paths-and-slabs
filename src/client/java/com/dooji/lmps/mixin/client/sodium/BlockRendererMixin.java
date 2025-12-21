@@ -5,7 +5,7 @@ import net.caffeinemc.mods.sodium.client.render.chunk.compile.ChunkBuildBuffers;
 import net.caffeinemc.mods.sodium.client.render.chunk.compile.pipeline.BlockRenderer;
 import net.caffeinemc.mods.sodium.client.render.chunk.translucent_sorting.TranslucentGeometryCollector;
 import net.caffeinemc.mods.sodium.client.world.LevelSlice;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
@@ -28,7 +28,7 @@ public abstract class BlockRendererMixin {
     }
 
     @Inject(method = "renderModel", at = @At(value = "INVOKE", target = "Lorg/joml/Vector3f;set(FFF)Lorg/joml/Vector3f;", shift = At.Shift.AFTER))
-    private void lowerFriendlyModels(BakedModel bakedModel, BlockState blockState, BlockPos blockPosition, BlockPos modelOffset, CallbackInfo callbackInfo) {
+    private void lowerFriendlyModels(BlockStateModel model, BlockState blockState, BlockPos blockPosition, BlockPos origin, CallbackInfo callbackInfo) {
         if (levelForOffsets != null) {
             PathSupport.LoweringOffsets offsets = PathSupport.loweringOffsets(levelForOffsets, blockPosition);
             if (offsets != null && offsets.renderOffset() > 0.0) {
