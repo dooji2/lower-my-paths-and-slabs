@@ -1,0 +1,12 @@
+{
+	"required": false,
+	"package": "com.dooji.lmps.mixin.client.sodium",
+	"compatibilityLevel": "JAVA_21",
+    "client": [
+        "BlockRendererMixin",
+        "BlockOcclusionCacheMixin"
+    ],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

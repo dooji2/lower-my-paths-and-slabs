@@ -1,0 +1,42 @@
+{
+	"schemaVersion": 1,
+	"id": "${mod_id}",
+	"version": "${version}",
+	"name": "${mod_name}",
+	"description": "${description}",
+	"authors": [
+		"${mod_author}"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/lmps",
+		"sources": "https://github.com/dooji2/lower-my-paths-and-slabs"
+	},
+	"license": "${license}",
+	"icon": "assets/lmps/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.dooji.lmps.fabric.LmpsFabric"
+		],
+		"client": [
+			"com.dooji.lmps.fabric.LmpsFabric"
+		]
+	},
+	"mixins": [
+		"lmps.mixins.json",
+		{
+			"config": "lmps.client.mixins.json",
+			"environment": "client"
+		},
+		{
+			"config": "lmps.sodium.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=${fabric_loader_version}",
+		"minecraft": "${minecraft_version}",
+		"java": ">=21",
+		"fabric-api": ">=${fabric_version}"
+	}
+}
