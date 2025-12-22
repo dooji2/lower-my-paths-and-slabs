@@ -1,9 +1,11 @@
 package com.dooji.lmps.path;
 
+import java.util.List;
+
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.SlabType;
 
@@ -25,15 +27,33 @@ public final class PathSupport {
     }
 
     public static LoweringOffsets loweringOffsets(BlockGetter level, BlockPos position) {
+        int remainingChecks = calculateRemainingChecks(level, position);
+        LoweringOffsets offsets = loweringOffsets(level, position, remainingChecks);
+        if (offsets == null) {
+            return null;
+        }
+
+        List<BlockPos> linkedPositions = MultipartHelper.collectLinked(level, position);
+        for (BlockPos linkedPos : linkedPositions) {
+            LoweringOffsets linkedOffsets = loweringOffsets(level, linkedPos, calculateRemainingChecks(level, linkedPos));
+            if (!offsets.equals(linkedOffsets)) {
+                return null;
+            }
+        }
+
+        return offsets;
+    }
+
+    private static int calculateRemainingChecks(BlockGetter level, BlockPos position) {
         int remainingChecks = position.getY() - level.getMinBuildHeight() + 1;
         if (remainingChecks < 1) {
             remainingChecks = 1;
         }
 
-        return loweringOffsets(level, position, remainingChecks);
+        return remainingChecks;
     }
 
-    public static LoweringOffsets loweringOffsets(BlockGetter level, BlockPos position, int remainingChecks) {
+    private static LoweringOffsets loweringOffsets(BlockGetter level, BlockPos position, int remainingChecks) {
         if (remainingChecks <= 0) {
             return null;
         }
