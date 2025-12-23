@@ -5,6 +5,7 @@ import com.dooji.lmps.LMPSClient;
 import com.dooji.lmps.networking.ClientPayloadRegistrar;
 import com.dooji.lmps.networking.LmpsNetworking;
 import com.dooji.lmps.networking.payloads.OffsetOverridesPayload;
+import com.dooji.lmps.networking.payloads.OffsetSupportsPayload;
 import com.dooji.lmps.networking.payloads.OffsetTogglePayload;
 import com.dooji.lmps.platform.LmpsPlatform;
 import com.dooji.lmps.registry.LmpsItems;
@@ -33,6 +34,7 @@ public class LmpsFabric implements ModInitializer, ClientModInitializer {
         LmpsPlatform.useNetworkSender(ServerPlayNetworking::send);
 
         PayloadTypeRegistry.playS2C().register(OffsetOverridesPayload.TYPE, OffsetOverridesPayload.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(OffsetSupportsPayload.TYPE, OffsetSupportsPayload.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(OffsetTogglePayload.TYPE, OffsetTogglePayload.STREAM_CODEC);
 
         LmpsItems.registerFabric();
@@ -40,9 +42,13 @@ public class LmpsFabric implements ModInitializer, ClientModInitializer {
 
         registerCreativeTab();
 
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> LmpsNetworking.sendSnapshot(handler.player));
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            LmpsNetworking.sendSupports(handler.player);
+            LmpsNetworking.sendSnapshot(handler.player);
+        });
 
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((serverPlayer, serverLevel, serverLevel1) -> {
+            LmpsNetworking.sendSupports(serverPlayer);
             LmpsNetworking.sendSnapshot(serverPlayer);
         });
 

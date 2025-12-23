@@ -5,6 +5,7 @@ import com.dooji.lmps.LMPSClient;
 import com.dooji.lmps.networking.ClientPayloadRegistrar;
 import com.dooji.lmps.networking.LmpsNetworking;
 import com.dooji.lmps.networking.payloads.OffsetOverridesPayload;
+import com.dooji.lmps.networking.payloads.OffsetSupportsPayload;
 import com.dooji.lmps.networking.payloads.OffsetTogglePayload;
 import com.dooji.lmps.item.OffsetToolItem;
 import com.dooji.lmps.platform.LmpsPlatform;
@@ -64,6 +65,8 @@ public class LmpsNeoForge {
 
         registrar.playToClient(OffsetOverridesPayload.TYPE, OffsetOverridesPayload.STREAM_CODEC, (payload, context) -> {
         });
+        registrar.playToClient(OffsetSupportsPayload.TYPE, OffsetSupportsPayload.STREAM_CODEC, (payload, context) -> {
+        });
         registrar.playToClient(OffsetTogglePayload.TYPE, OffsetTogglePayload.STREAM_CODEC, (payload, context) -> {
         });
     }
@@ -88,6 +91,7 @@ public class LmpsNeoForge {
             return;
         }
 
+        LmpsNetworking.sendSupports(serverPlayer);
         LmpsNetworking.sendSnapshot(serverPlayer);
     }
 
@@ -96,6 +100,7 @@ public class LmpsNeoForge {
             return;
         }
 
+        LmpsNetworking.sendSupports(serverPlayer);
         LmpsNetworking.sendSnapshot(serverPlayer);
     }
 

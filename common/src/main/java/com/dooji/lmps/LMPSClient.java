@@ -2,8 +2,10 @@ package com.dooji.lmps;
 
 import com.dooji.lmps.networking.ClientPayloadRegistrar;
 import com.dooji.lmps.networking.payloads.OffsetOverridesPayload;
+import com.dooji.lmps.networking.payloads.OffsetSupportsPayload;
 import com.dooji.lmps.networking.payloads.OffsetTogglePayload;
 import com.dooji.lmps.path.OffsetClientState;
+import com.dooji.lmps.path.OffsetSupports;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,6 +44,11 @@ public final class LMPSClient {
             BlockState aboveState = minecraft.level.getBlockState(abovePos);
             minecraft.level.sendBlockUpdated(abovePos, aboveState, aboveState, 3);
             minecraft.level.setBlocksDirty(abovePos, aboveState, aboveState);
+        });
+
+        networking.register(OffsetSupportsPayload.TYPE, OffsetSupportsPayload.STREAM_CODEC, payload -> {
+            OffsetSupports.applyFromNetwork(payload.supports());
+            LOGGER.info("Received {} offset supports from server", payload.supports().size());
         });
     }
 }
