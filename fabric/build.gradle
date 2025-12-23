@@ -59,3 +59,12 @@ loom {
         }
     }
 }
+
+tasks.named('remapJar') {
+    def minecraftVersion = project.minecraft_version
+    def modVersion = project.version
+    def namespace = project.mod_id
+
+    archiveBaseName.set("${namespace}-${modVersion}-fabric-mc${minecraftVersion}")
+    archiveVersion.set("")
+}

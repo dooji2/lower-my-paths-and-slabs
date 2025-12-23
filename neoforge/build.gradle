@@ -67,3 +67,12 @@ dependencies {
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+tasks.named('jar') {
+    def minecraftVersion = project.minecraft_version
+    def modVersion = project.version
+    def namespace = project.mod_id
+
+    archiveBaseName.set("${namespace}-${modVersion}-neoforge-mc${minecraftVersion}")
+    archiveVersion.set("")
+}
