@@ -3,7 +3,7 @@ A Minecraft mod that lets you place blocks on top of dirt paths and slabs, by lo
 
 **This mod doesn't modify anything permanently, therefore you can remove it or add it back at anytime!**
 
-<img width="1920" height="1009" alt="2025-12-18_17 09 19" src="https://github.com/user-attachments/assets/6b81f495-112c-4c0e-97a7-2f46cbf7f9b5" />
+<img width="1920" height="1009" alt="2025-12-26_01 51 49" src="https://github.com/user-attachments/assets/52ebce96-4e0b-4a1b-b0a1-2d59f023f1be" />
 
 There is an Offset Tool (found in the Tools & Utilities tab) which toggles lowering per-block. Offsets are off by default except for blocks sitting directly on a dirt path or bottom slab, and you can turn them on or off by right-clicking with the Offset Tool. By default, toggling offsets requires permission level 4 (configurable in `config/lmps_permissions.json` on the server).
 
