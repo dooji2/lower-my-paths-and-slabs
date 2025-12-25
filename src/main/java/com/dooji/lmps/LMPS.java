@@ -1,6 +1,7 @@
 package com.dooji.lmps;
 
 import com.dooji.lmps.networking.LmpsNetworking;
+import com.dooji.lmps.path.OffsetSupports;
 import com.dooji.lmps.permission.LmpsPermissions;
 import com.dooji.lmps.registry.LmpsItems;
 import net.fabricmc.api.ModInitializer;
@@ -18,16 +19,19 @@ public class LMPS implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        OffsetSupports.load();
         LmpsPermissions.load();
         LmpsNetworking.register();
 
         LmpsItems.register();
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            LmpsNetworking.sendSupports(handler.player);
             LmpsNetworking.sendSnapshot(handler.player);
         });
 
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((serverPlayer, serverLevel, serverLevel1) -> {
+            LmpsNetworking.sendSupports(serverPlayer);
             LmpsNetworking.sendSnapshot(serverPlayer);
         });
 

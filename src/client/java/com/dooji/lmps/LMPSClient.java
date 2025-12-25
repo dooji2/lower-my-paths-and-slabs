@@ -1,8 +1,11 @@
 package com.dooji.lmps;
 
 import com.dooji.lmps.networking.payloads.OffsetOverridesPayload;
+import com.dooji.lmps.networking.payloads.OffsetSupportsPayload;
 import com.dooji.lmps.networking.payloads.OffsetTogglePayload;
 import com.dooji.lmps.path.OffsetClientState;
+import com.dooji.lmps.path.OffsetSupports;
+
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.core.BlockPos;
@@ -41,6 +44,13 @@ public class LMPSClient implements ClientModInitializer {
                 BlockState aboveState = clientPlayNetworkingContext.client().level.getBlockState(abovePos);
                 clientPlayNetworkingContext.client().level.sendBlockUpdated(abovePos, aboveState, aboveState, 3);
                 clientPlayNetworkingContext.client().level.setBlocksDirty(abovePos, aboveState, aboveState);
+            })
+        );
+
+        ClientPlayNetworking.registerGlobalReceiver(OffsetSupportsPayload.TYPE, (payload, clientPlayNetworkingContext) -> 
+            clientPlayNetworkingContext.client().execute(() -> {
+                OffsetSupports.applyFromNetwork(payload.supports());
+                LOGGER.info("Received {} offset supports from server", payload.supports().size());
             })
         );
     }
