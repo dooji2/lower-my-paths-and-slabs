@@ -6,7 +6,10 @@
         "BlockEntityRenderStateMixin",
         "BlockStateOffsetMixin",
         "indigo.BlockRenderInfoMixin",
-        "BlockEntityRenderDispatcherMixin"
+        "BlockEntityRenderDispatcherMixin",
+        "ItemFrameRenderStateMixin",
+        "ItemFrameRendererMixin",
+        "EntityBoundingBoxMixin"
     ],
 	"injectors": {
 		"defaultRequire": 1
