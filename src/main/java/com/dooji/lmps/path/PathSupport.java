@@ -12,6 +12,8 @@ public final class PathSupport {
     private PathSupport() {
     }
 
+    private static boolean shapeGuardActive;
+
     public static boolean hasDirectLoweringSupport(BlockGetter level, BlockPos position) {
         return hasLoweringSupport(level, position.below());
     }
@@ -66,18 +68,25 @@ public final class PathSupport {
             return null;
         }
 
-        VoxelShape shape = blockState.getCollisionShape(level, position);
-        if (shape.isEmpty()) {
-            shape = blockState.getShape(level, position);
+        VoxelShape shape;
+        boolean wasGuarded = shapeGuardActive;
+        shapeGuardActive = true;
+        try {
+            shape = blockState.getCollisionShape(level, position);
+            if (shape.isEmpty()) {
+                shape = blockState.getShape(level, position);
+            }
+        } finally {
+            shapeGuardActive = wasGuarded;
         }
 
-        double height = Math.min(1.0, shape.max(Axis.Y));
+        double height = shape.max(Axis.Y);
         double offset = 1.0 - height;
         if (offset <= 0.0) {
             return null;
         }
 
-        return new LoweringOffsets(offset, -offset);
+        return new LoweringOffsets(offset, offset);
     }
 
     public static boolean hasLoweringSupport(BlockGetter level, BlockPos position) {
@@ -86,4 +95,9 @@ public final class PathSupport {
 
     public record LoweringOffsets(double renderOffset, double collisionOffset) {
     }
+
+    public static boolean isShapeGuardActive() {
+        return shapeGuardActive;
+    }
+
 }
