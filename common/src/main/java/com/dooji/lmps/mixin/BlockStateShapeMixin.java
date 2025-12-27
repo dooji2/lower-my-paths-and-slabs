@@ -15,14 +15,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class BlockStateShapeMixin {
     @Inject(method = "getShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;", at = @At("RETURN"), cancellable = true)
     private void lowerOutline(BlockGetter level, BlockPos position, CollisionContext collisionContext, CallbackInfoReturnable<VoxelShape> callbackInfoReturnable) {
-        PathSupport.LoweringOffsets offsets = PathSupport.loweringOffsets(level, position);
-        if (offsets != null && offsets.renderOffset() > 0.0) {
-            callbackInfoReturnable.setReturnValue(callbackInfoReturnable.getReturnValue().move(0.0, -offsets.renderOffset(), 0.0));
+        if (PathSupport.isShapeGuardActive()) {
+            return;
         }
-    }
 
-    @Inject(method = "getShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/phys/shapes/VoxelShape;", at = @At("RETURN"), cancellable = true)
-    private void lowerOutlineNoContext(BlockGetter level, BlockPos position, CallbackInfoReturnable<VoxelShape> callbackInfoReturnable) {
+        if (collisionContext == CollisionContext.empty()) {
+            return;
+        }
+
         PathSupport.LoweringOffsets offsets = PathSupport.loweringOffsets(level, position);
         if (offsets != null && offsets.renderOffset() > 0.0) {
             callbackInfoReturnable.setReturnValue(callbackInfoReturnable.getReturnValue().move(0.0, -offsets.renderOffset(), 0.0));
@@ -31,22 +31,27 @@ public abstract class BlockStateShapeMixin {
 
     @Inject(method = "getCollisionShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;", at = @At("RETURN"), cancellable = true)
     private void lowerCollision(BlockGetter level, BlockPos position, CollisionContext collisionContext, CallbackInfoReturnable<VoxelShape> callbackInfoReturnable) {
-        PathSupport.LoweringOffsets offsets = PathSupport.loweringOffsets(level, position);
-        if (offsets != null && offsets.collisionOffset() != 0.0) {
-            callbackInfoReturnable.setReturnValue(callbackInfoReturnable.getReturnValue().move(0.0, -offsets.collisionOffset(), 0.0));
+        if (PathSupport.isShapeGuardActive()) {
+            return;
         }
-    }
 
-    @Inject(method = "getCollisionShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/phys/shapes/VoxelShape;", at = @At("RETURN"), cancellable = true)
-    private void lowerCollisionNoContext(BlockGetter level, BlockPos position, CallbackInfoReturnable<VoxelShape> callbackInfoReturnable) {
         PathSupport.LoweringOffsets offsets = PathSupport.loweringOffsets(level, position);
-        if (offsets != null && offsets.collisionOffset() != 0.0) {
-            callbackInfoReturnable.setReturnValue(callbackInfoReturnable.getReturnValue().move(0.0, -offsets.collisionOffset(), 0.0));
+        if (offsets != null && offsets.collisionOffset() > 0.0) {
+            VoxelShape original = callbackInfoReturnable.getReturnValue();
+            if (original.isEmpty()) {
+                return;
+            }
+
+            callbackInfoReturnable.setReturnValue(original.move(0.0, -offsets.collisionOffset(), 0.0));
         }
     }
 
     @Inject(method = "getOcclusionShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/phys/shapes/VoxelShape;", at = @At("RETURN"), cancellable = true)
     private void lowerOcclusion(BlockGetter level, BlockPos position, CallbackInfoReturnable<VoxelShape> callbackInfoReturnable) {
+        if (PathSupport.isShapeGuardActive()) {
+            return;
+        }
+
         PathSupport.LoweringOffsets offsets = PathSupport.loweringOffsets(level, position);
         if (offsets != null && offsets.renderOffset() > 0.0) {
             callbackInfoReturnable.setReturnValue(callbackInfoReturnable.getReturnValue().move(0.0, -offsets.renderOffset(), 0.0));
@@ -55,6 +60,10 @@ public abstract class BlockStateShapeMixin {
 
     @Inject(method = "getVisualShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;", at = @At("RETURN"), cancellable = true)
     private void lowerVisual(BlockGetter level, BlockPos position, CollisionContext collisionContext, CallbackInfoReturnable<VoxelShape> callbackInfoReturnable) {
+        if (PathSupport.isShapeGuardActive()) {
+            return;
+        }
+
         PathSupport.LoweringOffsets offsets = PathSupport.loweringOffsets(level, position);
         if (offsets != null && offsets.renderOffset() > 0.0) {
             callbackInfoReturnable.setReturnValue(callbackInfoReturnable.getReturnValue().move(0.0, -offsets.renderOffset(), 0.0));
