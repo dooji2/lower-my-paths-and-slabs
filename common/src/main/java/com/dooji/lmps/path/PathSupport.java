@@ -12,13 +12,17 @@ public final class PathSupport {
     private PathSupport() {
     }
 
-    private static boolean shapeGuardActive;
+    private static final ThreadLocal<Integer> shapeGuardDepth = ThreadLocal.withInitial(() -> 0);
 
     public static boolean hasDirectLoweringSupport(BlockGetter level, BlockPos position) {
         return hasLoweringSupport(level, position.below());
     }
 
     public static LoweringOffsets loweringOffsets(BlockGetter level, BlockPos position) {
+        if (level == null) {
+            return null;
+        }
+
         int remainingChecks = calculateRemainingChecks(level, position);
         LoweringOffsets offsets = loweringOffsets(level, position, remainingChecks);
         if (offsets == null) {
@@ -69,15 +73,19 @@ public final class PathSupport {
         }
 
         VoxelShape shape;
-        boolean wasGuarded = shapeGuardActive;
-        shapeGuardActive = true;
+        shapeGuardDepth.set(shapeGuardDepth.get() + 1);
         try {
             shape = blockState.getCollisionShape(level, position);
             if (shape.isEmpty()) {
                 shape = blockState.getShape(level, position);
             }
         } finally {
-            shapeGuardActive = wasGuarded;
+            int depth = shapeGuardDepth.get() - 1;
+            if (depth <= 0) {
+                shapeGuardDepth.remove();
+            } else {
+                shapeGuardDepth.set(depth);
+            }
         }
 
         double height = shape.max(Axis.Y);
@@ -97,6 +105,6 @@ public final class PathSupport {
     }
 
     public static boolean isShapeGuardActive() {
-        return shapeGuardActive;
+        return shapeGuardDepth.get() > 0;
     }
 }
