@@ -2,5 +2,12 @@
   "item.lmps.offset_tool": "Offset Tool",
   "text.lmps.offset_tool.enabled": "Enabled Offset",
   "text.lmps.offset_tool.disabled": "Disabled Offset",
-  "text.lmps.offset_tool.no_permission": "You do not have permission to toggle offsets"
+  "text.lmps.offset_tool.no_permission": "You do not have permission to toggle offsets",
+  "text.lmps.config.title": "LMPS Configuration",
+  "text.lmps.config.category.general": "General",
+  "text.lmps.config.group.permissions": "Permissions",
+  "text.lmps.config.required_permission_level": "Required Permission Level",
+  "text.lmps.config.required_permission_level.description": "Minimum operator level required to use the Offset Tool and make config updates.",
+  "text.lmps.config.supports_entries": "Supports",
+  "text.lmps.config.supports_entries.description": "One entry per line. Block ids like minecraft:dirt_path and tags like #minecraft:slabs."
 }

@@ -11,6 +11,10 @@ base {
 }
 
 repositories {
+	maven {
+		url = "https://maven.quiltmc.org/repository/release/"
+	}
+
 	exclusiveContent {
 		forRepository {
 			maven {
@@ -52,6 +56,14 @@ dependencies {
 	if (!project.hasProperty("noIrisRuntime")) {
 		modLocalRuntime "maven.modrinth:YL57xq9U:${project.iris_version}"
 	}
+	modCompileOnly "maven.modrinth:1eAoo2KR:${project.yacl_version}"
+    modLocalRuntime "maven.modrinth:1eAoo2KR:${project.yacl_version}"
+    modCompileOnly "maven.modrinth:mOgUt4GM:${project.modmenu_version}"
+    modLocalRuntime "maven.modrinth:mOgUt4GM:${project.modmenu_version}"
+
+    modLocalRuntime "org.quiltmc.parsers:gson:0.2.1"
+    modLocalRuntime "org.quiltmc.parsers:json:0.2.1"
+    modLocalRuntime "org.jetbrains:annotations:24.0.1"
 	
 }
 

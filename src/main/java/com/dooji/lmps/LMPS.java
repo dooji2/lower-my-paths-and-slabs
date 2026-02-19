@@ -28,11 +28,13 @@ public class LMPS implements ModInitializer {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             LmpsNetworking.sendSupports(handler.player);
             LmpsNetworking.sendSnapshot(handler.player);
+            LmpsNetworking.sendPermissionLevel(handler.player);
         });
 
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((serverPlayer, serverLevel, serverLevel1) -> {
             LmpsNetworking.sendSupports(serverPlayer);
             LmpsNetworking.sendSnapshot(serverPlayer);
+            LmpsNetworking.sendPermissionLevel(serverPlayer);
         });
 
         UseBlockCallback.EVENT.register((player, level, hand, blockHitResult) -> {

@@ -3,6 +3,7 @@ package com.dooji.lmps;
 import com.dooji.lmps.networking.payloads.OffsetOverridesPayload;
 import com.dooji.lmps.networking.payloads.OffsetSupportsPayload;
 import com.dooji.lmps.networking.payloads.OffsetTogglePayload;
+import com.dooji.lmps.networking.payloads.PermissionLevelSyncPayload;
 import com.dooji.lmps.path.OffsetClientState;
 import com.dooji.lmps.path.OffsetSupports;
 
@@ -14,6 +15,15 @@ import org.slf4j.Logger;
 
 public class LMPSClient implements ClientModInitializer {
     private static final Logger LOGGER = LMPS.LOGGER;
+    private static int requiredPermissionLevel = 4;
+
+    public static int requiredPermissionLevel() {
+        return requiredPermissionLevel;
+    }
+
+    public static void setRequiredPermissionLevel(int permissionLevel) {
+        requiredPermissionLevel = permissionLevel;
+    }
 
     @Override
     public void onInitializeClient() {
@@ -52,6 +62,12 @@ public class LMPSClient implements ClientModInitializer {
                 OffsetSupports.applyFromNetwork(payload.supports());
                 LOGGER.info("Received {} offset supports from server", payload.supports().size());
             })
+        );
+
+        ClientPlayNetworking.registerGlobalReceiver(PermissionLevelSyncPayload.TYPE, (payload, clientPlayNetworkingContext) ->
+            clientPlayNetworkingContext.client().execute(() ->
+                setRequiredPermissionLevel(payload.permissionLevel())
+            )
         );
     }
 }

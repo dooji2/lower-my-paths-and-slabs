@@ -50,4 +50,27 @@ public final class LmpsPermissions {
         PermissionLevel level = PermissionLevel.byId(requiredPermissionLevel);
         return serverPlayer.permissions().hasPermission(new Permission.HasCommandLevel(level));
     }
+
+    public static int requiredPermissionLevel() {
+        return requiredPermissionLevel;
+    }
+
+    public static boolean setRequiredPermissionLevel(int permissionLevel) {
+        int clampedLevel = Math.max(0, Math.min(4, permissionLevel));
+        if (requiredPermissionLevel == clampedLevel) {
+            return false;
+        }
+
+        requiredPermissionLevel = clampedLevel;
+        Path configPath = FabricLoader.getInstance().getConfigDir().resolve("lmps_permissions.json");
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("required_permission_level", requiredPermissionLevel);
+        try (Writer writer = Files.newBufferedWriter(configPath)) {
+            GSON.toJson(jsonObject, writer);
+        } catch (IOException exception) {
+            LMPS.LOGGER.warn("Failed to write lmps config", exception);
+        }
+
+        return true;
+    }
 }

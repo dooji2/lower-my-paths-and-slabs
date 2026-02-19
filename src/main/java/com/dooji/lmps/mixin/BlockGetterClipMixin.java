@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BlockGetter.class)
 public interface BlockGetterClipMixin {
-    @Inject(method = "clip(Lnet/minecraft/world/level/ClipContext;)Lnet/minecraft/world/phys/BlockHitResult;", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "clip", at = @At("RETURN"), cancellable = true)
     private void lowerClip(ClipContext clipContext, CallbackInfoReturnable<BlockHitResult> cir) {
         BlockGetter level = (BlockGetter) (Object) this;
         BlockHitResult fallback = BlockGetter.traverseBlocks(clipContext.getFrom(), clipContext.getTo(), clipContext, (context, position) -> {
