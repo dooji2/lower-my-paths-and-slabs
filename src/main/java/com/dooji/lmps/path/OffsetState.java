@@ -29,10 +29,6 @@ public final class OffsetState {
             return override;
         }
 
-        if (!PathSupport.hasDirectLoweringSupport(level, position)) {
-            return false;
-        }
-
         return false;
     }
 
