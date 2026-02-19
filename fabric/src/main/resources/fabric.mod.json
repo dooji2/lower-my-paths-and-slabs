@@ -20,6 +20,9 @@
 		],
 		"client": [
 			"com.dooji.lmps.fabric.LmpsFabric"
+		],
+		"modmenu": [
+			"com.dooji.lmps.fabric.config.LmpsModMenu"
 		]
 	},
 	"mixins": [
@@ -38,5 +41,9 @@
 		"minecraft": "${minecraft_version}",
 		"java": ">=21",
 		"fabric-api": ">=${fabric_version}"
+	},
+	"suggests": {
+		"modmenu": "*",
+		"yet_another_config_lib_v3": "*"
 	}
 }

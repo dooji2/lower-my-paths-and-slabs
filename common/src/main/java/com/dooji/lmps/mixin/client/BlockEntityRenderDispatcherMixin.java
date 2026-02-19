@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BlockEntityRenderDispatcher.class)
 public abstract class BlockEntityRenderDispatcherMixin {
-    @Inject(method = "render(Lnet/minecraft/world/level/block/entity/BlockEntity;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V", at = @At("HEAD"))
+    @Inject(method = "render", at = @At("HEAD"))
     private <T extends BlockEntity> void lowerAll(T blockEntity, float tickDelta, PoseStack poseStack, MultiBufferSource buffers, CallbackInfo callbackInfo) {
         if (blockEntity.getLevel() == null) {
             return;

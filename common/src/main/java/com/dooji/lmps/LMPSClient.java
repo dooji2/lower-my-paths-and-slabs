@@ -4,6 +4,7 @@ import com.dooji.lmps.networking.ClientPayloadRegistrar;
 import com.dooji.lmps.networking.payloads.OffsetOverridesPayload;
 import com.dooji.lmps.networking.payloads.OffsetSupportsPayload;
 import com.dooji.lmps.networking.payloads.OffsetTogglePayload;
+import com.dooji.lmps.networking.payloads.PermissionLevelSyncPayload;
 import com.dooji.lmps.path.OffsetClientState;
 import com.dooji.lmps.path.OffsetSupports;
 import net.minecraft.client.Minecraft;
@@ -13,8 +14,17 @@ import org.slf4j.Logger;
 
 public final class LMPSClient {
     private static final Logger LOGGER = LMPS.LOGGER;
+    private static int requiredPermissionLevel = 4;
 
     private LMPSClient() {
+    }
+
+    public static int requiredPermissionLevel() {
+        return requiredPermissionLevel;
+    }
+
+    public static void setRequiredPermissionLevel(int permissionLevel) {
+        requiredPermissionLevel = permissionLevel;
     }
 
     public static void onInitializeClient(ClientPayloadRegistrar networking) {
@@ -49,6 +59,10 @@ public final class LMPSClient {
         networking.register(OffsetSupportsPayload.TYPE, OffsetSupportsPayload.STREAM_CODEC, payload -> {
             OffsetSupports.applyFromNetwork(payload.supports());
             LOGGER.info("Received {} offset supports from server", payload.supports().size());
+        });
+
+        networking.register(PermissionLevelSyncPayload.TYPE, PermissionLevelSyncPayload.STREAM_CODEC, payload -> {
+            setRequiredPermissionLevel(payload.permissionLevel());
         });
     }
 }

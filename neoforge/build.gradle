@@ -64,6 +64,8 @@ dependencies {
     if (!project.hasProperty("noIrisRuntime")) {
         runtimeOnly "maven.modrinth:YL57xq9U:${project.neoforge_iris_version}"
     }
+    compileOnly "maven.modrinth:1eAoo2KR:${project.neoforge_yacl_version}"
+    runtimeOnly "maven.modrinth:1eAoo2KR:${project:neoforge_yacl_version}"
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }

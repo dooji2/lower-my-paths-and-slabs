@@ -1,13 +1,16 @@
 package com.dooji.lmps.networking;
 
 import com.dooji.lmps.networking.payloads.OffsetOverridesPayload;
-import com.dooji.lmps.networking.payloads.OffsetTogglePayload;
 import com.dooji.lmps.networking.payloads.OffsetSupportsPayload;
+import com.dooji.lmps.networking.payloads.OffsetTogglePayload;
+import com.dooji.lmps.networking.payloads.PermissionLevelSyncPayload;
 import com.dooji.lmps.path.OffsetSavedData;
 import com.dooji.lmps.path.OffsetSupports;
+import com.dooji.lmps.permission.LmpsPermissions;
 import com.dooji.lmps.platform.LmpsPlatform;
 import it.unimi.dsi.fastutil.longs.Long2BooleanMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -23,6 +26,24 @@ public final class LmpsNetworking {
 
     public static void sendSupports(ServerPlayer player) {
         LmpsPlatform.sendTo(player, new OffsetSupportsPayload(OffsetSupports.currentEntries()));
+    }
+
+    public static void broadcastSupports(MinecraftServer server) {
+        OffsetSupportsPayload payload = new OffsetSupportsPayload(OffsetSupports.currentEntries());
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            LmpsPlatform.sendTo(player, payload);
+        }
+    }
+
+    public static void sendPermissionLevel(ServerPlayer player) {
+        LmpsPlatform.sendTo(player, new PermissionLevelSyncPayload(LmpsPermissions.requiredPermissionLevel()));
+    }
+
+    public static void broadcastPermissionLevel(MinecraftServer server) {
+        PermissionLevelSyncPayload payload = new PermissionLevelSyncPayload(LmpsPermissions.requiredPermissionLevel());
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            LmpsPlatform.sendTo(player, payload);
+        }
     }
 
     public static void broadcastToggle(ServerLevel level, BlockPos position, Boolean override) {

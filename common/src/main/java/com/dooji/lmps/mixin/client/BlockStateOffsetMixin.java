@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BlockBehaviour.BlockStateBase.class)
 public abstract class BlockStateOffsetMixin {
-    @Inject(method = "getOffset(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/phys/Vec3;", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "getOffset", at = @At("RETURN"), cancellable = true)
     private void lowerFriendlyBlocks(BlockGetter level, BlockPos position, CallbackInfoReturnable<Vec3> callbackInfoReturnable) {
         PathSupport.LoweringOffsets offsets = PathSupport.loweringOffsets(level, position);
         if (offsets != null && offsets.renderOffset() > 0.0) {

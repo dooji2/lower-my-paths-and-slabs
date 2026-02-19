@@ -20,7 +20,7 @@ public abstract class BlockShouldRenderFaceMixin {
         return offsets != null && offsets.renderOffset() > 0.0;
     }
 
-    @Inject(method = "shouldRenderFace(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;Lnet/minecraft/core/BlockPos;)Z", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "shouldRenderFace", at = @At("HEAD"), cancellable = true)
     private static void forceFacesWhenHeightDiffers(BlockState blockState, BlockGetter level, BlockPos position, Direction direction, BlockPos neighborPosition, CallbackInfoReturnable<Boolean> callbackInfoReturnable) {
         boolean lowered = isLowered(level, position);
         boolean neighborLowered = isLowered(level, neighborPosition);

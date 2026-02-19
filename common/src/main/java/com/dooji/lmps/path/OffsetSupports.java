@@ -52,6 +52,21 @@ public final class OffsetSupports {
         apply(supports);
     }
 
+    public static boolean setEntries(List<String> supports) {
+        List<String> entries = supports;
+        if (entries == null || entries.isEmpty()) {
+            entries = DEFAULT_SUPPORTS;
+        }
+
+        if (configuredEntries.equals(entries)) {
+            return false;
+        }
+
+        apply(entries);
+        writeConfig(LmpsPlatform.configPath(FILE_NAME), entries);
+        return true;
+    }
+
     public static List<String> currentEntries() {
         return new ArrayList<>(configuredEntries);
     }
@@ -91,10 +106,14 @@ public final class OffsetSupports {
     }
 
     private static void writeDefault(Path configPath) {
+        writeConfig(configPath, DEFAULT_SUPPORTS);
+    }
+
+    private static void writeConfig(Path configPath, List<String> supports) {
         try (Writer writer = Files.newBufferedWriter(configPath)) {
             JsonObject jsonObject = new JsonObject();
             JsonArray supportsArray = new JsonArray();
-            DEFAULT_SUPPORTS.forEach(supportsArray::add);
+            supports.forEach(supportsArray::add);
             jsonObject.add("supports", supportsArray);
             GSON.toJson(jsonObject, writer);
         } catch (IOException exception) {
@@ -103,7 +122,18 @@ public final class OffsetSupports {
     }
 
     private static List<Entry> compile(List<String> supports) {
-        Set<String> unique = new LinkedHashSet<>(supports);
+        Set<String> unique = new LinkedHashSet<>();
+        for (String support : supports) {
+            if (support == null) {
+                continue;
+            }
+
+            String normalized = support.trim();
+            if (!normalized.isEmpty()) {
+                unique.add(normalized);
+            }
+        }
+
         List<Entry> entries = new ArrayList<>(unique.size());
         for (String raw : unique) {
             Entry entry = parse(raw);

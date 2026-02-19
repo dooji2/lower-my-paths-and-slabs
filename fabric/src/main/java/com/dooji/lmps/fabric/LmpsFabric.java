@@ -7,6 +7,11 @@ import com.dooji.lmps.networking.LmpsNetworking;
 import com.dooji.lmps.networking.payloads.OffsetOverridesPayload;
 import com.dooji.lmps.networking.payloads.OffsetSupportsPayload;
 import com.dooji.lmps.networking.payloads.OffsetTogglePayload;
+import com.dooji.lmps.networking.payloads.OffsetSupportsUpdatePayload;
+import com.dooji.lmps.networking.payloads.PermissionLevelSyncPayload;
+import com.dooji.lmps.networking.payloads.PermissionLevelUpdatePayload;
+import com.dooji.lmps.path.OffsetSupports;
+import com.dooji.lmps.permission.LmpsPermissions;
 import com.dooji.lmps.platform.LmpsPlatform;
 import com.dooji.lmps.registry.LmpsItems;
 import net.fabricmc.api.ClientModInitializer;
@@ -22,6 +27,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
@@ -36,6 +42,17 @@ public class LmpsFabric implements ModInitializer, ClientModInitializer {
         PayloadTypeRegistry.playS2C().register(OffsetOverridesPayload.TYPE, OffsetOverridesPayload.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(OffsetSupportsPayload.TYPE, OffsetSupportsPayload.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(OffsetTogglePayload.TYPE, OffsetTogglePayload.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(PermissionLevelSyncPayload.TYPE, PermissionLevelSyncPayload.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(PermissionLevelUpdatePayload.TYPE, PermissionLevelUpdatePayload.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(OffsetSupportsUpdatePayload.TYPE, OffsetSupportsUpdatePayload.STREAM_CODEC);
+
+        ServerPlayNetworking.registerGlobalReceiver(PermissionLevelUpdatePayload.TYPE, (payload, context) ->
+            context.server().execute(() -> handlePermissionLevelUpdate(context.player(), payload.permissionLevel()))
+        );
+
+        ServerPlayNetworking.registerGlobalReceiver(OffsetSupportsUpdatePayload.TYPE, (payload, context) ->
+            context.server().execute(() -> handleSupportsUpdate(context.player(), payload.supports()))
+        );
 
         LmpsItems.registerFabric();
         LMPS.onInitialize();
@@ -45,11 +62,13 @@ public class LmpsFabric implements ModInitializer, ClientModInitializer {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             LmpsNetworking.sendSupports(handler.player);
             LmpsNetworking.sendSnapshot(handler.player);
+            LmpsNetworking.sendPermissionLevel(handler.player);
         });
 
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((serverPlayer, serverLevel, serverLevel1) -> {
             LmpsNetworking.sendSupports(serverPlayer);
             LmpsNetworking.sendSnapshot(serverPlayer);
+            LmpsNetworking.sendPermissionLevel(serverPlayer);
         });
 
         UseBlockCallback.EVENT.register((player, level, hand, blockHitResult) -> {
@@ -64,6 +83,38 @@ public class LmpsFabric implements ModInitializer, ClientModInitializer {
     @Override
     public void onInitializeClient() {
         LMPSClient.onInitializeClient(buildClientRegistrar());
+    }
+
+    private static void handlePermissionLevelUpdate(ServerPlayer player, int permissionLevel) {
+        if (!LmpsPermissions.canToggle(player)) {
+            LmpsNetworking.sendPermissionLevel(player);
+            return;
+        }
+
+        boolean changed = LmpsPermissions.setRequiredPermissionLevel(permissionLevel);
+        if (changed && player.getServer() != null) {
+            LmpsNetworking.broadcastPermissionLevel(player.getServer());
+            return;
+        }
+
+        LmpsNetworking.sendPermissionLevel(player);
+    }
+
+    private static void handleSupportsUpdate(ServerPlayer player, java.util.List<String> supports) {
+        OffsetSupports.load();
+
+        if (!LmpsPermissions.canToggle(player)) {
+            LmpsNetworking.sendSupports(player);
+            return;
+        }
+
+        boolean changed = OffsetSupports.setEntries(supports);
+        if (changed && player.getServer() != null) {
+            LmpsNetworking.broadcastSupports(player.getServer());
+            return;
+        }
+
+        LmpsNetworking.sendSupports(player);
     }
 
     private ClientPayloadRegistrar buildClientRegistrar() {

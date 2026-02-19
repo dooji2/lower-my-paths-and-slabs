@@ -46,7 +46,7 @@ public abstract class BlockStateShapeMixin {
         }
     }
 
-    @Inject(method = "getOcclusionShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/phys/shapes/VoxelShape;", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "getOcclusionShape", at = @At("RETURN"), cancellable = true)
     private void lowerOcclusion(BlockGetter level, BlockPos position, CallbackInfoReturnable<VoxelShape> callbackInfoReturnable) {
         if (PathSupport.isShapeGuardActive()) {
             return;

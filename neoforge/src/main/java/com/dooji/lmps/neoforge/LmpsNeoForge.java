@@ -7,7 +7,13 @@ import com.dooji.lmps.networking.LmpsNetworking;
 import com.dooji.lmps.networking.payloads.OffsetOverridesPayload;
 import com.dooji.lmps.networking.payloads.OffsetSupportsPayload;
 import com.dooji.lmps.networking.payloads.OffsetTogglePayload;
+import com.dooji.lmps.networking.payloads.OffsetSupportsUpdatePayload;
+import com.dooji.lmps.networking.payloads.PermissionLevelSyncPayload;
+import com.dooji.lmps.networking.payloads.PermissionLevelUpdatePayload;
 import com.dooji.lmps.item.OffsetToolItem;
+import com.dooji.lmps.neoforge.config.LmpsYaclPermissionScreenBuilder;
+import com.dooji.lmps.path.OffsetSupports;
+import com.dooji.lmps.permission.LmpsPermissions;
 import com.dooji.lmps.platform.LmpsPlatform;
 import com.dooji.lmps.registry.LmpsItems;
 import net.minecraft.network.FriendlyByteBuf;
@@ -20,9 +26,11 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -39,9 +47,12 @@ public class LmpsNeoForge {
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(LMPS.MOD_ID);
     private static final DeferredHolder<Item, Item> OFFSET_TOOL_HOLDER = ITEMS.register("offset_tool", () -> new OffsetToolItem(new Item.Properties()));
 
-    public LmpsNeoForge(IEventBus modEventBus) {
+    public LmpsNeoForge(IEventBus modEventBus, ModContainer modContainer) {
         LmpsPlatform.useConfigPathProvider(filename -> FMLPaths.CONFIGDIR.get().resolve(filename));
         LmpsPlatform.useNetworkSender((player, payload) -> PacketDistributor.sendToPlayer(player, payload));
+        if (FMLEnvironment.dist.isClient()) {
+            modContainer.registerExtensionPoint(IConfigScreenFactory.class, (container, parent) -> LmpsYaclPermissionScreenBuilder.build(parent));
+        }
 
         ITEMS.register(modEventBus);
         modEventBus.addListener(this::registerPayloads);
@@ -57,6 +68,21 @@ public class LmpsNeoForge {
 
     private void registerPayloads(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar(LMPS.MOD_ID);
+        registrar.playToServer(PermissionLevelUpdatePayload.TYPE, PermissionLevelUpdatePayload.STREAM_CODEC, (payload, context) ->
+            context.enqueueWork(() -> {
+                if (context.player() instanceof ServerPlayer serverPlayer) {
+                    handlePermissionLevelUpdate(serverPlayer, payload.permissionLevel());
+                }
+            })
+        );
+
+        registrar.playToServer(OffsetSupportsUpdatePayload.TYPE, OffsetSupportsUpdatePayload.STREAM_CODEC, (payload, context) ->
+            context.enqueueWork(() -> {
+                if (context.player() instanceof ServerPlayer serverPlayer) {
+                    handleSupportsUpdate(serverPlayer, payload.supports());
+                }
+            })
+        );
 
         if (FMLEnvironment.dist.isClient()) {
             LMPSClient.onInitializeClient(buildClientRegistrar(registrar));
@@ -68,6 +94,8 @@ public class LmpsNeoForge {
         registrar.playToClient(OffsetSupportsPayload.TYPE, OffsetSupportsPayload.STREAM_CODEC, (payload, context) -> {
         });
         registrar.playToClient(OffsetTogglePayload.TYPE, OffsetTogglePayload.STREAM_CODEC, (payload, context) -> {
+        });
+        registrar.playToClient(PermissionLevelSyncPayload.TYPE, PermissionLevelSyncPayload.STREAM_CODEC, (payload, context) -> {
         });
     }
 
@@ -93,6 +121,7 @@ public class LmpsNeoForge {
 
         LmpsNetworking.sendSupports(serverPlayer);
         LmpsNetworking.sendSnapshot(serverPlayer);
+        LmpsNetworking.sendPermissionLevel(serverPlayer);
     }
 
     private void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
@@ -102,6 +131,7 @@ public class LmpsNeoForge {
 
         LmpsNetworking.sendSupports(serverPlayer);
         LmpsNetworking.sendSnapshot(serverPlayer);
+        LmpsNetworking.sendPermissionLevel(serverPlayer);
     }
 
     private void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
@@ -128,5 +158,37 @@ public class LmpsNeoForge {
         if (event.getRegistryKey().equals(Registries.ITEM)) {
             LmpsItems.setOffsetTool(OFFSET_TOOL_HOLDER.get());
         }
+    }
+
+    private static void handlePermissionLevelUpdate(ServerPlayer player, int permissionLevel) {
+        if (!LmpsPermissions.canToggle(player)) {
+            LmpsNetworking.sendPermissionLevel(player);
+            return;
+        }
+
+        boolean changed = LmpsPermissions.setRequiredPermissionLevel(permissionLevel);
+        if (changed && player.getServer() != null) {
+            LmpsNetworking.broadcastPermissionLevel(player.getServer());
+            return;
+        }
+
+        LmpsNetworking.sendPermissionLevel(player);
+    }
+
+    private static void handleSupportsUpdate(ServerPlayer player, java.util.List<String> supports) {
+        OffsetSupports.load();
+
+        if (!LmpsPermissions.canToggle(player)) {
+            LmpsNetworking.sendSupports(player);
+            return;
+        }
+
+        boolean changed = OffsetSupports.setEntries(supports);
+        if (changed && player.getServer() != null) {
+            LmpsNetworking.broadcastSupports(player.getServer());
+            return;
+        }
+
+        LmpsNetworking.sendSupports(player);
     }
 }

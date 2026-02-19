@@ -4,6 +4,11 @@ plugins {
 }
 
 repositories {
+    maven {
+        name = "Xander Maven"
+        url = uri("https://maven.isxander.dev/releases")
+    }
+
 	exclusiveContent {
 		forRepository {
 			maven {
@@ -34,6 +39,10 @@ dependencies {
     if (!project.hasProperty("noIrisRuntime")) {
         modLocalRuntime "maven.modrinth:YL57xq9U:${project.fabric_iris_version}"
     }
+    modCompileOnly "dev.isxander:yet-another-config-lib:${project.fabric_yacl_version}"
+    modLocalRuntime "dev.isxander:yet-another-config-lib:${project.fabric_yacl_version}"
+    modCompileOnly "maven.modrinth:mOgUt4GM:${project.fabric_modmenu_version}"
+    modLocalRuntime "maven.modrinth:mOgUt4GM:${project.fabric_modmenu_version}"
 }
 
 loom {
